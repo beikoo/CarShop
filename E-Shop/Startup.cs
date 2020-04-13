@@ -27,11 +27,13 @@ namespace E_Shop
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ShopDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ShopDbContext>();
-            services.AddControllersWithViews();
+            services.AddDefaultIdentity<IdentityUser>(/*options => options.SignIn.RequireConfirmedAccount = true*/).AddEntityFrameworkStores<ShopDbContext>().AddDefaultUI();
+           
             services.AddScoped<ICarRepository, CarRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddMvc();
+            //services.AddMvc();
+            services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,18 +45,30 @@ namespace E_Shop
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
             app.UseRouting();
-            app.UseAuthentication();
-            app.UseStaticFiles();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+            });
+            //app.UseHttpsRedirection();
+            //app.UseStaticFiles();
+            //app.UseRouting();
+            //app.UseAuthentication();
+            //app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "default", 
+                    name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}"
                     );
-                endpoints.MapControllers();
+                //endpoints.MapControllers();
                 endpoints.MapRazorPages();
+                
             });
         }
     }
